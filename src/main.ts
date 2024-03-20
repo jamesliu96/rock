@@ -154,7 +154,7 @@ const main = async () => {
   $type.style.opacity = '0.5';
   const $init = document.createElement('div');
   body.append($init);
-  $init.textContent = '⏵';
+  $init.textContent = '▶️';
   $init.style.width = '100%';
   $init.style.height = '100%';
   $init.style.display = 'flex';
