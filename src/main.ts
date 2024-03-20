@@ -85,8 +85,8 @@ const main = async () => {
   const $artist = document.createElement('div');
   const $song = document.createElement('div');
   const $album = document.createElement('div');
-  const $release = document.createElement('div');
   const $label = document.createElement('div');
+  const $release = document.createElement('div');
   const $comment = document.createElement('div');
   const $tagline = document.createElement('div');
   const $type = document.createElement('div');
@@ -96,8 +96,8 @@ const main = async () => {
     $artist,
     $song,
     $album,
-    $release,
     $label,
+    $release,
     $comment,
     $tagline,
     $type
@@ -161,8 +161,8 @@ const main = async () => {
     $artist.textContent = play.artist ?? '';
     $song.textContent = play.song ?? '';
     $album.textContent = play.album ?? '';
-    $release.textContent = play.release_date ?? '';
     $label.textContent = play.labels?.join(' & ') ?? '';
+    $release.textContent = play.release_date ?? '';
     $comment.textContent = play.comment ?? '';
     $tagline.textContent = play.show?.tagline ?? '';
     $type.textContent = play.play_type ?? '';
