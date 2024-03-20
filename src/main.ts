@@ -102,8 +102,6 @@ const main = async () => {
   body.style.margin = '0px';
   body.style.minHeight = '100vh';
   body.style.display = 'flex';
-  body.style.flexDirection = 'column';
-  body.style.justifyContent = 'center';
   body.style.alignItems = 'center';
   body.style.backgroundPosition = 'center';
   body.style.backgroundSize = 'cover';
@@ -114,10 +112,21 @@ const main = async () => {
   body.style.textAlign = 'center';
   body.style.lineHeight = '1.5';
   body.style.padding = '10px';
+  body.style.gap = '8px';
+  body.style.overflowX = 'hidden';
   const $style = document.createElement('style');
   head.append($style);
   $style.sheet?.insertRule('* { box-sizing: border-box; }');
+  $style.sheet?.insertRule(
+    '@media (orientation: landscape) { body { flex-direction: row; justify-content: space-around; } }'
+  );
+  $style.sheet?.insertRule(
+    '@media (orientation: portrait) { body { flex-direction: column; justify-content: center; } }'
+  );
   const $cover = document.createElement('img');
+  const $info = document.createElement('div');
+  const $init = document.createElement('div');
+  body.append($cover, $info, $init);
   const $show = document.createElement('div');
   const $artist = document.createElement('div');
   const $song = document.createElement('div');
@@ -127,8 +136,7 @@ const main = async () => {
   const $comment = document.createElement('div');
   const $tagline = document.createElement('div');
   const $type = document.createElement('div');
-  body.append(
-    $cover,
+  $info.append(
     $show,
     $artist,
     $song,
@@ -140,7 +148,11 @@ const main = async () => {
     $type
   );
   $cover.style.border = '1px solid #ccc';
-  $cover.style.maxWidth = '100%';
+  $cover.style.maxWidth = 'min(calc(100vw - 20px), calc(100vh - 20px))';
+  $cover.style.maxHeight = 'min(calc(100vw - 20px), calc(100vh - 20px))';
+  $cover.style.aspectRatio = '1 / 1';
+  $cover.style.objectFit = 'cover';
+  $info.style.overflowWrap = 'anywhere';
   $show.style.fontSize = 'smaller';
   $artist.style.fontWeight = 'bold';
   $song.style.fontStyle = 'italic';
@@ -152,8 +164,6 @@ const main = async () => {
   $tagline.style.fontSize = 'xx-small';
   $type.style.fontSize = 'xx-small';
   $type.style.opacity = '0.5';
-  const $init = document.createElement('div');
-  body.append($init);
   $init.textContent = '▶️';
   $init.style.width = '100%';
   $init.style.height = '100%';
