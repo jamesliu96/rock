@@ -141,10 +141,10 @@ const main = async () => {
   );
   $cover.style.border = '1px solid #ccc';
   $cover.style.maxWidth = '100%';
-  $show.style.fontSize = 'small';
+  $show.style.fontSize = 'smaller';
   $artist.style.fontWeight = 'bold';
   $song.style.fontStyle = 'italic';
-  $release.style.fontSize = 'smaller';
+  $release.style.fontSize = 'x-small';
   $label.style.fontSize = 'x-small';
   $tagline.style.fontSize = 'xx-small';
   $comment.style.fontSize = 'xx-small';
