@@ -62,6 +62,32 @@ const main = async () => {
   body.addEventListener('click', () => {
     booster();
   });
+  let path: string;
+  switch (new URLSearchParams(location.search).get('format')?.toLowerCase()) {
+    case 'aac':
+    case 'aache':
+    case 'aac-he':
+    case 'aac_he': {
+      path = 'kexp64.aac';
+      break;
+    }
+    case 'aaclc':
+    case 'aac-lc':
+    case 'aac_lc': {
+      path = 'kexp160.aac';
+      break;
+    }
+    case 'mp3-128':
+    case 'mp3_128':
+    case '128': {
+      path = 'kexp128.mp3';
+      break;
+    }
+    default: {
+      path = 'kexp320.mp3';
+      break;
+    }
+  }
   body.style.margin = '0px';
   body.style.minHeight = '100vh';
   body.style.display = 'flex';
@@ -132,7 +158,7 @@ const main = async () => {
   const handle = () => {
     body.removeEventListener('click', handle);
     $init.remove();
-    new Audio('https://kexp.streamguys1.com/kexp320.mp3').play();
+    new Audio(`https://kexp.streamguys1.com/${path}`).play();
   };
   body.addEventListener('click', handle);
   for (
