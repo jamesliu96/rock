@@ -83,8 +83,19 @@ const main = async () => {
       path = 'kexp128.mp3';
       break;
     }
-    default: {
+    case 'mp3':
+    case 'mp3-320':
+    case 'mp3_320':
+    case '320': {
       path = 'kexp320.mp3';
+      break;
+    }
+    default: {
+      path = (
+        navigator as typeof navigator & { connection?: { saveData?: boolean } }
+      ).connection?.saveData
+        ? 'kexp64.aac'
+        : 'kexp320.mp3';
       break;
     }
   }
