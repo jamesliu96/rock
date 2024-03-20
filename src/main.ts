@@ -113,7 +113,7 @@ const main = async () => {
   body.style.fontFamily = 'monospace';
   body.style.textAlign = 'center';
   body.style.lineHeight = '1.5';
-  body.style.padding = '0px 10px';
+  body.style.padding = '10px';
   const $style = document.createElement('style');
   head.append($style);
   $style.sheet?.insertRule('* { box-sizing: border-box; }');
@@ -144,11 +144,14 @@ const main = async () => {
   $show.style.fontSize = 'smaller';
   $artist.style.fontWeight = 'bold';
   $song.style.fontStyle = 'italic';
-  $release.style.fontSize = 'x-small';
+  $song.style.fontWeight = 'bold';
+  $album.style.fontStyle = 'italic';
   $label.style.fontSize = 'x-small';
-  $tagline.style.fontSize = 'xx-small';
+  $release.style.fontSize = 'x-small';
   $comment.style.fontSize = 'xx-small';
+  $tagline.style.fontSize = 'xx-small';
   $type.style.fontSize = 'xx-small';
+  $type.style.opacity = '0.5';
   const $init = document.createElement('div');
   body.append($init);
   $init.textContent = '⏵';
