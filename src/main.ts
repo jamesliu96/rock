@@ -118,7 +118,7 @@ const main = async () => {
   head.append($style);
   $style.sheet?.insertRule('* { box-sizing: border-box; }');
   $style.sheet?.insertRule(
-    '@media (orientation: landscape) { body { flex-direction: row; justify-content: space-around; } }'
+    '@media (orientation: landscape) { body { flex-direction: row; justify-content: space-evenly; } }'
   );
   $style.sheet?.insertRule(
     '@media (orientation: portrait) { body { flex-direction: column; justify-content: center; } }'
