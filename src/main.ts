@@ -80,11 +80,11 @@ const sleep = (ms: number) =>
   });
 
 let geoip: GeoIP | null | undefined;
-const update = async () => {
+const geo = async () => {
   if (geoip) return;
   geoip = await (await fetch('https://malus.carapax.net/geoip.json')).json();
 };
-const proxy = () => geoip?.country?.iso_code === 'CN';
+const proxied = () => geoip?.country?.iso_code === 'CN';
 
 const main = async () => {
   let booster = () => {};
@@ -228,7 +228,7 @@ const main = async () => {
     }),
       await Promise.race([sleep(30000), boost])
   ) {
-    update();
+    geo();
     const play = (
       (await (
         await fetch(
@@ -240,7 +240,7 @@ const main = async () => {
     const imageURL =
       play.image_uri || play.thumbnail_uri || play.show?.image_uri;
     const url =
-      imageURL && proxy()
+      imageURL && proxied()
         ? `https://malus.carapax.net/x?${new URLSearchParams({
             url: imageURL,
           })}`
