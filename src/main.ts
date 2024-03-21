@@ -62,16 +62,21 @@ const geo = async () => {
 };
 const proxied = () => geoip?.country?.iso_code === 'CN';
 
+const vibe = () =>
+  (navigator as Optional<typeof navigator> | Nil)?.vibrate?.(1);
+
 const main = async () => {
   let booster = () => {};
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') {
       booster();
+      vibe();
     }
   });
   const { body, head } = document;
   body.addEventListener('click', () => {
     booster();
+    vibe();
   });
   const path = (() => {
     switch (new URLSearchParams(location.search).get('format')?.toLowerCase()) {
@@ -224,18 +229,21 @@ const main = async () => {
         : imageURL;
     body.style.backgroundImage = `url(${url})`;
     $cover.src = `${url}`;
-    const hosts = play.show?.host_names?.join(' & ');
-    $show.textContent = `${play.show?.program_name ?? ''}${
-      hosts ? ` with ${hosts}` : ''
-    }`;
-    $artist.textContent = play.artist ?? '';
-    $song.textContent = play.song ?? '';
-    $album.textContent = play.album ?? '';
-    $label.textContent = play.labels?.join(' & ') ?? '';
-    $release.textContent = play.release_date ?? '';
-    $comment.textContent = play.comment ?? '';
-    $tagline.textContent = play.show?.tagline ?? '';
-    $type.textContent = play.play_type ?? '';
+    $show.textContent = play.show
+      ? `${play.show.program_name ?? ''}${
+          play.show.host_names?.length
+            ? ` with ${play.show.host_names.join(' & ')}`
+            : ''
+        }`
+      : null;
+    $artist.textContent = play.artist ?? null;
+    $song.textContent = play.song ?? null;
+    $album.textContent = play.album ?? null;
+    $label.textContent = play.labels?.join(' & ') ?? null;
+    $release.textContent = play.release_date ?? null;
+    $comment.textContent = play.comment ?? null;
+    $tagline.textContent = play.show?.tagline ?? null;
+    $type.textContent = play.play_type ?? null;
   }
 };
 
