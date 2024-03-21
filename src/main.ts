@@ -46,9 +46,54 @@ type Play = Optional<{
   }>[];
 }>;
 
+type GeoIP = Optional<{
+  continent: Optional<{
+    names: Record<string, string>;
+    code: string;
+    geoname_id: number;
+  }>;
+  country: Optional<{
+    names: Record<string, string>;
+    geoname_id: number;
+    iso_code: string;
+  }>;
+  registered_country: Optional<{
+    names: Record<string, string>;
+    geoname_id: number;
+    iso_code: string;
+  }>;
+  traits: Optional<{
+    ip_address: string;
+    network: string;
+  }>;
+  location: Optional<{
+    accuracy_radius: number;
+    latitude: number;
+    longitude: number;
+    time_zone: string;
+  }>;
+}>;
+
 const sleep = (ms: number) =>
   new Promise<void>((resolve) => {
     setTimeout(resolve, ms);
+  });
+
+let g: GeoIP | undefined;
+const geoip = async () => {
+  if (g) return g;
+  g = (await fetch('https://malus.carapax.net/geoip.json')).json() as
+    | GeoIP
+    | undefined;
+  return g;
+};
+const proxy = async () => (await geoip())?.country?.iso_code === 'CN';
+const loadable = (src: string) =>
+  new Promise<boolean>((resolve) => {
+    const image = new Image();
+    image.onload = () => resolve(true);
+    image.onerror = () => resolve(false);
+    image.src = src;
   });
 
 const main = async () => {
@@ -201,7 +246,21 @@ const main = async () => {
       ).json()) as Play | undefined
     )?.results?.[0];
     if (!play) return;
-    const url = play.image_uri || play.thumbnail_uri || play.show?.image_uri;
+    const imageURL =
+      play.image_uri || play.thumbnail_uri || play.show?.image_uri;
+    const proxiedImageURL = imageURL
+      ? `https://malus.carapax.net/x?${new URLSearchParams({
+          url: imageURL,
+        })}`
+      : imageURL;
+    const url =
+      imageURL &&
+      proxiedImageURL &&
+      (await proxy()) &&
+      !(await loadable(imageURL)) &&
+      (await loadable(proxiedImageURL))
+        ? proxiedImageURL
+        : imageURL;
     body.style.backgroundImage = `url(${url})`;
     $cover.src = `${url}`;
     const hosts = play.show?.host_names?.join(' & ');

@@ -6,13 +6,12 @@
     "tsc": "tsc",
     "tsc:w": "tsc -w",
     "serve": "serve",
-    "watch": "npm-run-all -s clean -p tsc:w serve",
+    "start": "npm-run-all -s clean -p tsc:w serve",
     "build": "run-s clean tsc"
   },
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
-    "nodemon": "3",
     "npm-run-all": "4",
     "rimraf": "5",
     "serve": "14",
