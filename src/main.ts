@@ -80,7 +80,7 @@ const sleep = (ms: number) =>
   });
 
 let geoip: GeoIP | null | undefined;
-const updateProxy = async () => {
+const update = async () => {
   if (geoip) return;
   geoip = (await fetch('https://malus.carapax.net/geoip.json')).json() as
     | GeoIP
@@ -88,14 +88,7 @@ const updateProxy = async () => {
     | undefined;
 };
 const proxy = () => geoip?.country?.iso_code === 'CN';
-
-const loadable = (src: string) =>
-  new Promise<boolean>((resolve) => {
-    const image = new Image();
-    image.onload = () => resolve(true);
-    image.onerror = () => resolve(false);
-    image.src = src;
-  });
+update();
 
 const main = async () => {
   let booster = () => {};
@@ -239,6 +232,7 @@ const main = async () => {
     }),
       await Promise.race([sleep(30000), boost])
   ) {
+    update();
     const play = (
       (await (
         await fetch(
@@ -249,19 +243,11 @@ const main = async () => {
     if (!play) return;
     const imageURL =
       play.image_uri || play.thumbnail_uri || play.show?.image_uri;
-    updateProxy();
-    const proxiedImageURL = imageURL
-      ? `https://malus.carapax.net/x?${new URLSearchParams({
-          url: imageURL,
-        })}`
-      : imageURL;
     const url =
-      imageURL &&
-      proxiedImageURL &&
-      proxy() &&
-      !(await loadable(imageURL)) &&
-      (await loadable(proxiedImageURL))
-        ? proxiedImageURL
+      imageURL && proxy()
+        ? `https://malus.carapax.net/x?${new URLSearchParams({
+            url: imageURL,
+          })}`
         : imageURL;
     body.style.backgroundImage = `url(${url})`;
     $cover.src = `${url}`;
