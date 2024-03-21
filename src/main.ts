@@ -46,33 +46,7 @@ type Play = Optional<{
   }>[];
 }>;
 
-type GeoIP = Optional<{
-  continent: Optional<{
-    names: Record<string, string>;
-    code: string;
-    geoname_id: number;
-  }>;
-  country: Optional<{
-    names: Record<string, string>;
-    geoname_id: number;
-    iso_code: string;
-  }>;
-  registered_country: Optional<{
-    names: Record<string, string>;
-    geoname_id: number;
-    iso_code: string;
-  }>;
-  traits: Optional<{
-    ip_address: string;
-    network: string;
-  }>;
-  location: Optional<{
-    accuracy_radius: number;
-    latitude: number;
-    longitude: number;
-    time_zone: string;
-  }>;
-}>;
+type GeoIP = Optional<{ country: Optional<{ iso_code: string }> }>;
 
 const sleep = (ms: number) =>
   new Promise<void>((resolve) => {
