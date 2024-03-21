@@ -79,15 +79,16 @@ const sleep = (ms: number) =>
     setTimeout(resolve, ms);
   });
 
-let g: GeoIP | undefined;
-const geoip = async () => {
-  if (g) return g;
-  g = (await fetch('https://malus.carapax.net/geoip.json')).json() as
+let geoip: GeoIP | null | undefined;
+const updateProxy = async () => {
+  if (geoip) return;
+  geoip = (await fetch('https://malus.carapax.net/geoip.json')).json() as
     | GeoIP
+    | null
     | undefined;
-  return g;
 };
-const proxy = async () => (await geoip())?.country?.iso_code === 'CN';
+const proxy = () => geoip?.country?.iso_code === 'CN';
+
 const loadable = (src: string) =>
   new Promise<boolean>((resolve) => {
     const image = new Image();
@@ -243,11 +244,12 @@ const main = async () => {
         await fetch(
           `https://api.kexp.org/v2/plays/?expand=show&format=json&limit=1&ordering=-airdate&airdate_before=${new Date().toISOString()}`
         )
-      ).json()) as Play | undefined
+      ).json()) as Play | null | undefined
     )?.results?.[0];
     if (!play) return;
     const imageURL =
       play.image_uri || play.thumbnail_uri || play.show?.image_uri;
+    updateProxy();
     const proxiedImageURL = imageURL
       ? `https://malus.carapax.net/x?${new URLSearchParams({
           url: imageURL,
@@ -256,7 +258,7 @@ const main = async () => {
     const url =
       imageURL &&
       proxiedImageURL &&
-      (await proxy()) &&
+      proxy() &&
       !(await loadable(imageURL)) &&
       (await loadable(proxiedImageURL))
         ? proxiedImageURL
