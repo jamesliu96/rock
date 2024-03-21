@@ -1,5 +1,7 @@
+type Nil = null | undefined;
+
 type Optional<T> = {
-  [P in keyof T]?: T[P] | null;
+  [P in keyof T]?: T[P] | Nil;
 };
 
 type Play = Optional<{
@@ -53,7 +55,7 @@ const sleep = (ms: number) =>
     setTimeout(resolve, ms);
   });
 
-let geoip: GeoIP | null | undefined;
+let geoip: GeoIP | Nil;
 const geo = async () => {
   if (geoip) return;
   geoip = await (await fetch('https://malus.carapax.net/geoip.json')).json();
@@ -71,43 +73,45 @@ const main = async () => {
   body.addEventListener('click', () => {
     booster();
   });
-  let path: string;
-  switch (new URLSearchParams(location.search).get('format')?.toLowerCase()) {
-    case 'aac':
-    case 'aache':
-    case 'aac-he':
-    case 'aac_he': {
-      path = 'kexp64.aac';
-      break;
+  const path = (() => {
+    switch (new URLSearchParams(location.search).get('format')?.toLowerCase()) {
+      case 'aac':
+      case 'aache':
+      case 'aac-he':
+      case 'aac_he': {
+        return 'kexp64.aac';
+      }
+      case 'aaclc':
+      case 'aac-lc':
+      case 'aac_lc': {
+        return 'kexp160.aac';
+      }
+      case 'mp3-128':
+      case 'mp3_128':
+      case '128': {
+        return 'kexp128.mp3';
+      }
+      case 'mp3':
+      case 'mp3-320':
+      case 'mp3_320':
+      case '320': {
+        return 'kexp320.mp3';
+      }
+      default: {
+        return (
+          navigator as
+            | Optional<
+                typeof navigator & {
+                  connection: Optional<{ saveData: boolean }>;
+                }
+              >
+            | Nil
+        )?.connection?.saveData
+          ? 'kexp64.aac'
+          : 'kexp320.mp3';
+      }
     }
-    case 'aaclc':
-    case 'aac-lc':
-    case 'aac_lc': {
-      path = 'kexp160.aac';
-      break;
-    }
-    case 'mp3-128':
-    case 'mp3_128':
-    case '128': {
-      path = 'kexp128.mp3';
-      break;
-    }
-    case 'mp3':
-    case 'mp3-320':
-    case 'mp3_320':
-    case '320': {
-      path = 'kexp320.mp3';
-      break;
-    }
-    default: {
-      path = (
-        navigator as typeof navigator & { connection?: { saveData?: boolean } }
-      ).connection?.saveData
-        ? 'kexp64.aac'
-        : 'kexp320.mp3';
-      break;
-    }
-  }
+  })();
   body.style.margin = '0px';
   body.style.minHeight = '100vh';
   body.style.display = 'flex';
@@ -115,6 +119,7 @@ const main = async () => {
   body.style.backgroundPosition = 'center';
   body.style.backgroundSize = 'cover';
   body.style.backgroundRepeat = 'no-repeat';
+  body.style.backgroundColor = 'black';
   body.style.backdropFilter = 'blur(16px) brightness(0.5)';
   body.style.color = 'white';
   body.style.fontFamily = 'monospace';
@@ -174,17 +179,15 @@ const main = async () => {
   $type.style.fontSize = 'xx-small';
   $type.style.opacity = '0.5';
   $init.textContent = '▶️';
-  $init.style.width = '100%';
-  $init.style.height = '100%';
   $init.style.display = 'flex';
   $init.style.justifyContent = 'center';
   $init.style.alignItems = 'center';
   $init.style.position = 'fixed';
   $init.style.top = '0px';
+  $init.style.right = '0px';
+  $init.style.bottom = '0px';
   $init.style.left = '0px';
-  $init.style.fontSize = 'calc(min(100vw, 100vh))';
-  $init.style.lineHeight = '1';
-  $init.style.background = 'rgb(0 0 0 / 50%)';
+  $init.style.background = 'rgba(0, 0, 0, 0.5)';
   $init.style.overflow = 'hidden';
   $init.style.userSelect = 'none';
   $init.style.pointerEvents = 'none';
@@ -208,7 +211,7 @@ const main = async () => {
         await fetch(
           `https://api.kexp.org/v2/plays/?expand=show&format=json&limit=1&ordering=-airdate&airdate_before=${new Date().toISOString()}`
         )
-      ).json()) as Play | null | undefined
+      ).json()) as Play | Nil
     )?.results?.[0];
     if (!play) return;
     const imageURL =
