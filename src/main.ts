@@ -82,13 +82,9 @@ const sleep = (ms: number) =>
 let geoip: GeoIP | null | undefined;
 const update = async () => {
   if (geoip) return;
-  geoip = (await fetch('https://malus.carapax.net/geoip.json')).json() as
-    | GeoIP
-    | null
-    | undefined;
+  geoip = await (await fetch('https://malus.carapax.net/geoip.json')).json();
 };
 const proxy = () => geoip?.country?.iso_code === 'CN';
-update();
 
 const main = async () => {
   let booster = () => {};
