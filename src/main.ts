@@ -70,49 +70,6 @@ type GeoIP = Optional<{ country: Optional<{ iso_code: string }> }>;
     }
   });
   const { body, head } = document;
-  const audio = new Audio(
-    `https://kexp.streamguys1.com/${(() => {
-      switch (
-        new URLSearchParams(location.search).get('format')?.toLowerCase()
-      ) {
-        case 'aac':
-        case 'aache':
-        case 'aac-he':
-        case 'aac_he': {
-          return 'kexp64.aac';
-        }
-        case 'aaclc':
-        case 'aac-lc':
-        case 'aac_lc': {
-          return 'kexp160.aac';
-        }
-        case 'mp3-128':
-        case 'mp3_128':
-        case '128': {
-          return 'kexp128.mp3';
-        }
-        case 'mp3':
-        case 'mp3-320':
-        case 'mp3_320':
-        case '320': {
-          return 'kexp320.mp3';
-        }
-        default: {
-          return (
-            navigator as
-              | Optional<
-                  typeof navigator & {
-                    connection: Optional<{ saveData: boolean }>;
-                  }
-                >
-              | Nil
-          )?.connection?.saveData
-            ? 'kexp64.aac'
-            : 'kexp320.mp3';
-        }
-      }
-    })()}`
-  );
   body.style.margin = '0px';
   body.style.minHeight = '100vh';
   body.style.display = 'flex';
@@ -192,13 +149,63 @@ type GeoIP = Optional<{ country: Optional<{ iso_code: string }> }>;
   $init.style.overflow = 'hidden';
   $init.style.userSelect = 'none';
   $init.style.pointerEvents = 'none';
+  const audioURL = `https://kexp.streamguys1.com/${(() => {
+    switch (new URLSearchParams(location.search).get('format')?.toLowerCase()) {
+      case 'aac':
+      case 'aache':
+      case 'aac-he':
+      case 'aac_he': {
+        return 'kexp64.aac';
+      }
+      case 'aaclc':
+      case 'aac-lc':
+      case 'aac_lc': {
+        return 'kexp160.aac';
+      }
+      case 'mp3-128':
+      case 'mp3_128':
+      case '128': {
+        return 'kexp128.mp3';
+      }
+      case 'mp3':
+      case 'mp3-320':
+      case 'mp3_320':
+      case '320': {
+        return 'kexp320.mp3';
+      }
+      default: {
+        return (
+          navigator as
+            | Optional<
+                typeof navigator & {
+                  connection: Optional<{ saveData: boolean }>;
+                }
+              >
+            | Nil
+        )?.connection?.saveData
+          ? 'kexp64.aac'
+          : 'kexp320.mp3';
+      }
+    }
+  })()}`;
+  let mutex = false;
+  let audio: HTMLAudioElement | Nil;
+  const play = async () => {
+    if (mutex) return;
+    mutex = true;
+    audio = audio ?? new Audio(audioURL);
+    try {
+      await audio.play();
+      $init.remove();
+    } catch {
+      audio = null;
+    }
+    mutex = false;
+  };
   body.addEventListener('click', () => {
-    audio
-      .play()
-      .then(() => $init.remove())
-      .catch(() => {});
     booster();
     vibe();
+    play();
   });
   for (
     let boost;
