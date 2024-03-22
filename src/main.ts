@@ -50,73 +50,69 @@ type Play = Optional<{
 
 type GeoIP = Optional<{ country: Optional<{ iso_code: string }> }>;
 
-const sleep = (ms: number) =>
-  new Promise<void>((resolve) => {
-    setTimeout(resolve, ms);
-  });
-
-let geoip: GeoIP | Nil;
-const geo = async () => {
-  if (geoip) return;
-  geoip = await (await fetch('https://malus.carapax.net/geoip.json')).json();
-};
-const proxied = () => geoip?.country?.iso_code === 'CN';
-
-const vibe = () =>
-  (navigator as Optional<typeof navigator> | Nil)?.vibrate?.(1);
-
-const main = async () => {
+(async () => {
+  const sleep = (ms: number) =>
+    new Promise<void>((resolve) => {
+      setTimeout(resolve, ms);
+    });
+  let geoip: GeoIP | Nil;
+  const geo = async () => {
+    if (geoip) return;
+    geoip = await (await fetch('https://malus.carapax.net/geoip.json')).json();
+  };
+  const proxied = () => geoip?.country?.iso_code === 'CN';
+  const vibe = () =>
+    (navigator as Optional<typeof navigator> | Nil)?.vibrate?.(1);
   let booster = () => {};
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') {
       booster();
-      vibe();
     }
   });
   const { body, head } = document;
-  body.addEventListener('click', () => {
-    booster();
-    vibe();
-  });
-  const path = (() => {
-    switch (new URLSearchParams(location.search).get('format')?.toLowerCase()) {
-      case 'aac':
-      case 'aache':
-      case 'aac-he':
-      case 'aac_he': {
-        return 'kexp64.aac';
+  const audio = new Audio(
+    `https://kexp.streamguys1.com/${(() => {
+      switch (
+        new URLSearchParams(location.search).get('format')?.toLowerCase()
+      ) {
+        case 'aac':
+        case 'aache':
+        case 'aac-he':
+        case 'aac_he': {
+          return 'kexp64.aac';
+        }
+        case 'aaclc':
+        case 'aac-lc':
+        case 'aac_lc': {
+          return 'kexp160.aac';
+        }
+        case 'mp3-128':
+        case 'mp3_128':
+        case '128': {
+          return 'kexp128.mp3';
+        }
+        case 'mp3':
+        case 'mp3-320':
+        case 'mp3_320':
+        case '320': {
+          return 'kexp320.mp3';
+        }
+        default: {
+          return (
+            navigator as
+              | Optional<
+                  typeof navigator & {
+                    connection: Optional<{ saveData: boolean }>;
+                  }
+                >
+              | Nil
+          )?.connection?.saveData
+            ? 'kexp64.aac'
+            : 'kexp320.mp3';
+        }
       }
-      case 'aaclc':
-      case 'aac-lc':
-      case 'aac_lc': {
-        return 'kexp160.aac';
-      }
-      case 'mp3-128':
-      case 'mp3_128':
-      case '128': {
-        return 'kexp128.mp3';
-      }
-      case 'mp3':
-      case 'mp3-320':
-      case 'mp3_320':
-      case '320': {
-        return 'kexp320.mp3';
-      }
-      default: {
-        return (
-          navigator as
-            | Optional<
-                typeof navigator & {
-                  connection: Optional<{ saveData: boolean }>;
-                }
-              >
-            | Nil
-        )?.connection?.saveData
-          ? 'kexp64.aac'
-          : 'kexp320.mp3';
-      }
-    }
-  })();
+    })()}`
+  );
   body.style.margin = '0px';
   body.style.minHeight = '100vh';
   body.style.display = 'flex';
@@ -166,7 +162,7 @@ const main = async () => {
     $tagline,
     $type
   );
-  $cover.style.border = '1px solid #ccc';
+  $cover.style.border = '1px solid rgba(255, 255, 255, 0.8)';
   $cover.style.maxWidth = 'min(calc(100vw - 20px), calc(100vh - 20px))';
   $cover.style.maxHeight = 'min(calc(100vw - 20px), calc(100vh - 20px))';
   $cover.style.aspectRatio = '1 / 1';
@@ -196,14 +192,16 @@ const main = async () => {
   $init.style.overflow = 'hidden';
   $init.style.userSelect = 'none';
   $init.style.pointerEvents = 'none';
-  const handle = () => {
-    body.removeEventListener('click', handle);
-    $init.remove();
-    new Audio(`https://kexp.streamguys1.com/${path}`).play();
-  };
-  body.addEventListener('click', handle);
+  body.addEventListener('click', () => {
+    audio
+      .play()
+      .then(() => $init.remove())
+      .catch(() => {});
+    booster();
+    vibe();
+  });
   for (
-    let boost: Promise<void>;
+    let boost;
     ;
     boost = new Promise<void>((resolve) => {
       booster = resolve;
@@ -245,6 +243,4 @@ const main = async () => {
     $tagline.textContent = play.show?.tagline ?? null;
     $type.textContent = play.play_type ?? null;
   }
-};
-
-main();
+})();
