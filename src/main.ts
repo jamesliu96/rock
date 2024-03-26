@@ -215,39 +215,44 @@ type GeoIP = Optional<{ country: Optional<{ iso_code: string }> }>;
     }),
       await Promise.race([sleep(30000), boost])
   ) {
-    geo();
-    const play = (
-      (await (
-        await fetch(
-          `https://api.kexp.org/v2/plays/?expand=show&format=json&limit=1&ordering=-airdate&airdate_before=${new Date().toISOString()}`
-        )
-      ).json()) as Play | Nil
-    )?.results?.[0];
-    if (!play) return;
-    const imageURL =
-      play.image_uri || play.thumbnail_uri || play.show?.image_uri;
-    const url =
-      imageURL && proxied()
-        ? `https://malus.carapax.net/x?${new URLSearchParams({
-            url: imageURL,
-          })}`
-        : imageURL;
-    body.style.backgroundImage = `url(${url})`;
-    $cover.src = `${url}`;
-    $show.textContent = play.show
-      ? `${play.show.program_name ?? ''}${
-          play.show.host_names?.length
-            ? ` with ${play.show.host_names.join(' & ')}`
-            : ''
-        }`
-      : null;
-    $artist.textContent = play.artist ?? null;
-    $song.textContent = play.song ?? null;
-    $album.textContent = play.album ?? null;
-    $label.textContent = play.labels?.join(' & ') ?? null;
-    $release.textContent = play.release_date ?? null;
-    $comment.textContent = play.comment ?? null;
-    $tagline.textContent = play.show?.tagline ?? null;
-    $type.textContent = play.play_type ?? null;
+    try {
+      geo();
+      const play = (
+        (await (
+          await fetch(
+            `https://api.kexp.org/v2/plays/?expand=show&format=json&limit=1&ordering=-airdate&airdate_before=${new Date().toISOString()}`
+          )
+        ).json()) as Play | Nil
+      )?.results?.[0];
+      if (!play) throw new Error('nil');
+      const imageURL =
+        play.image_uri || play.thumbnail_uri || play.show?.image_uri;
+      const url =
+        imageURL && proxied()
+          ? `https://malus.carapax.net/x?${new URLSearchParams({
+              url: imageURL,
+            })}`
+          : imageURL;
+      body.style.backgroundImage = `url(${url})`;
+      $cover.src = `${url}`;
+      $show.textContent = play.show
+        ? `${play.show.program_name ?? ''}${
+            play.show.host_names?.length
+              ? ` with ${play.show.host_names.join(' & ')}`
+              : ''
+          }`
+        : null;
+      $artist.textContent = play.artist ?? null;
+      $song.textContent = play.song ?? null;
+      $album.textContent = play.album ?? null;
+      $label.textContent = play.labels?.join(' & ') ?? null;
+      $release.textContent = play.release_date ?? null;
+      $comment.textContent = play.comment ?? null;
+      $tagline.textContent = play.show?.tagline ?? null;
+      $type.textContent = play.play_type ?? null;
+    } catch {
+      await sleep(1000);
+      continue;
+    }
   }
 })();
