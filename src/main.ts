@@ -51,24 +51,78 @@ type Play = Optional<{
 type GeoIP = Optional<{ country: Optional<{ iso_code: string }> }>;
 
 (async () => {
+  const MUTEX = new Map<Function, boolean>();
   const sleep = (ms: number) =>
     new Promise<void>((resolve) => {
       setTimeout(resolve, ms);
     });
   let geoip: GeoIP | Nil;
   const geo = async () => {
-    if (geoip) return;
-    geoip = await (await fetch('https://malus.carapax.net/geoip.json')).json();
+    if (MUTEX.get(geo)) return;
+    MUTEX.set(geo, true);
+    try {
+      geoip =
+        geoip ??
+        (await (await fetch('https://malus.carapax.net/geoip.json')).json());
+    } catch {}
+    MUTEX.set(geo, false);
   };
   const proxied = () => geoip?.country?.iso_code === 'CN';
   const vibe = () =>
     (navigator as Optional<typeof navigator> | Nil)?.vibrate?.(1);
   let booster = () => {};
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') {
-      booster();
+  const audioURL = `https://kexp.streamguys1.com/${(() => {
+    switch (new URLSearchParams(location.search).get('format')?.toLowerCase()) {
+      case 'aac':
+      case 'aache':
+      case 'aac-he':
+      case 'aac_he': {
+        return 'kexp64.aac';
+      }
+      case 'aaclc':
+      case 'aac-lc':
+      case 'aac_lc': {
+        return 'kexp160.aac';
+      }
+      case 'mp3-128':
+      case 'mp3_128':
+      case '128': {
+        return 'kexp128.mp3';
+      }
+      case 'mp3':
+      case 'mp3-320':
+      case 'mp3_320':
+      case '320': {
+        return 'kexp320.mp3';
+      }
+      default: {
+        return (
+          navigator as
+            | Optional<
+                typeof navigator & {
+                  connection: Optional<{ saveData: boolean }>;
+                }
+              >
+            | Nil
+        )?.connection?.saveData
+          ? 'kexp64.aac'
+          : 'kexp320.mp3';
+      }
     }
-  });
+  })()}`;
+  let audio: HTMLAudioElement | Nil;
+  const play = async () => {
+    if (MUTEX.get(play)) return;
+    MUTEX.set(play, true);
+    try {
+      audio = audio ?? new Audio(audioURL);
+      await audio.play();
+      $init.remove();
+    } catch {
+      audio = null;
+    }
+    MUTEX.set(play, false);
+  };
   const { body, head } = document;
   const $style = document.createElement('style');
   head.append($style);
@@ -148,59 +202,11 @@ type GeoIP = Optional<{ country: Optional<{ iso_code: string }> }>;
   $init.style.overflow = 'hidden';
   $init.style.userSelect = 'none';
   $init.style.pointerEvents = 'none';
-  const audioURL = `https://kexp.streamguys1.com/${(() => {
-    switch (new URLSearchParams(location.search).get('format')?.toLowerCase()) {
-      case 'aac':
-      case 'aache':
-      case 'aac-he':
-      case 'aac_he': {
-        return 'kexp64.aac';
-      }
-      case 'aaclc':
-      case 'aac-lc':
-      case 'aac_lc': {
-        return 'kexp160.aac';
-      }
-      case 'mp3-128':
-      case 'mp3_128':
-      case '128': {
-        return 'kexp128.mp3';
-      }
-      case 'mp3':
-      case 'mp3-320':
-      case 'mp3_320':
-      case '320': {
-        return 'kexp320.mp3';
-      }
-      default: {
-        return (
-          navigator as
-            | Optional<
-                typeof navigator & {
-                  connection: Optional<{ saveData: boolean }>;
-                }
-              >
-            | Nil
-        )?.connection?.saveData
-          ? 'kexp64.aac'
-          : 'kexp320.mp3';
-      }
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      booster();
     }
-  })()}`;
-  let mutex = false;
-  let audio: HTMLAudioElement | Nil;
-  const play = async () => {
-    if (mutex) return;
-    mutex = true;
-    audio = audio ?? new Audio(audioURL);
-    try {
-      await audio.play();
-      $init.remove();
-    } catch {
-      audio = null;
-    }
-    mutex = false;
-  };
+  });
   body.addEventListener('click', () => {
     booster();
     vibe();
