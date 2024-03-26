@@ -70,31 +70,8 @@ type GeoIP = Optional<{ country: Optional<{ iso_code: string }> }>;
     }
   });
   const { body, head } = document;
-  body.style.margin = '0px';
-  body.style.minHeight = '100vh';
-  body.style.display = 'flex';
-  body.style.alignItems = 'center';
-  body.style.backgroundPosition = 'center';
-  body.style.backgroundSize = 'cover';
-  body.style.backgroundRepeat = 'no-repeat';
-  body.style.backgroundColor = 'black';
-  body.style.backdropFilter = 'blur(16px) brightness(0.5)';
-  body.style.color = 'white';
-  body.style.fontFamily = 'monospace';
-  body.style.textAlign = 'center';
-  body.style.lineHeight = '1.5';
-  body.style.padding = '10px';
-  body.style.gap = '8px';
-  body.style.overflowX = 'hidden';
   const $style = document.createElement('style');
   head.append($style);
-  $style.sheet?.insertRule('* { box-sizing: border-box; }');
-  $style.sheet?.insertRule(
-    '@media (orientation: landscape) { body { flex-direction: row; justify-content: space-evenly; } }'
-  );
-  $style.sheet?.insertRule(
-    '@media (orientation: portrait) { body { flex-direction: column; justify-content: center; } }'
-  );
   const $cover = document.createElement('img');
   const $info = document.createElement('div');
   const $init = document.createElement('div');
@@ -119,7 +96,29 @@ type GeoIP = Optional<{ country: Optional<{ iso_code: string }> }>;
     $tagline,
     $type
   );
-  $cover.style.border = '1px solid rgba(255, 255, 255, 0.8)';
+  $style.sheet?.insertRule('* { box-sizing: border-box; }');
+  $style.sheet?.insertRule(
+    '@media (orientation: landscape) { body { flex-direction: row; justify-content: space-evenly; } }'
+  );
+  $style.sheet?.insertRule(
+    '@media (orientation: portrait) { body { flex-direction: column; justify-content: center; } }'
+  );
+  body.style.margin = '0px';
+  body.style.minHeight = '100vh';
+  body.style.display = 'flex';
+  body.style.alignItems = 'center';
+  body.style.backgroundPosition = 'center';
+  body.style.backgroundSize = 'cover';
+  body.style.backgroundRepeat = 'no-repeat';
+  body.style.backgroundColor = 'black';
+  body.style.backdropFilter = 'blur(16px) brightness(0.5)';
+  body.style.color = 'white';
+  body.style.fontFamily = 'monospace';
+  body.style.textAlign = 'center';
+  body.style.lineHeight = '1.5';
+  body.style.padding = '10px';
+  body.style.gap = '8px';
+  body.style.overflowX = 'hidden';
   $cover.style.maxWidth = 'min(calc(100vw - 20px), calc(100vh - 20px))';
   $cover.style.maxHeight = 'min(calc(100vw - 20px), calc(100vh - 20px))';
   $cover.style.aspectRatio = '1 / 1';
