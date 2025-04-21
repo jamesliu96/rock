@@ -207,7 +207,6 @@ type Play = Optional<{
       await Promise.race([sleep(30000), boost])
   ) {
     try {
-      geo();
       const play = (
         (await (
           await fetch(
