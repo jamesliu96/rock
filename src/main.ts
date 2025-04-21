@@ -48,26 +48,12 @@ type Play = Optional<{
   }>[];
 }>;
 
-type GeoIP = Optional<{ country: Optional<{ iso_code: string }> }>;
-
 (async () => {
   const MUTEX = new Map<Function, boolean>();
   const sleep = (ms: number) =>
     new Promise<void>((resolve) => {
       setTimeout(resolve, ms);
     });
-  let geoip: GeoIP | Nil;
-  const geo = async () => {
-    if (MUTEX.get(geo)) return;
-    MUTEX.set(geo, true);
-    try {
-      geoip =
-        geoip ??
-        (await (await fetch('https://malus.carapax.net/geoip.json')).json());
-    } catch {}
-    MUTEX.set(geo, false);
-  };
-  const proxied = () => geoip?.country?.iso_code === 'CN';
   const vibe = () =>
     (navigator as Optional<typeof navigator> | Nil)?.vibrate?.(1);
   let booster = () => {};
@@ -230,14 +216,8 @@ type GeoIP = Optional<{ country: Optional<{ iso_code: string }> }>;
         ).json()) as Play | Nil
       )?.results?.[0];
       if (!play) throw new Error('nil');
-      const imageURL =
-        play.image_uri || play.thumbnail_uri || play.show?.image_uri;
       const url =
-        imageURL && proxied()
-          ? `https://malus.carapax.net/x?${new URLSearchParams({
-              url: imageURL,
-            })}`
-          : imageURL;
+        play.image_uri || play.thumbnail_uri || play.show?.image_uri;
       body.style.backgroundImage = `url(${url})`;
       $cover.src = `${url}`;
       $show.textContent = play.show
